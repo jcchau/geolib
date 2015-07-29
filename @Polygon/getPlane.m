@@ -37,4 +37,8 @@ if(dot(normal, normal) == 0)
     error('Error: All edges of the polygon are parallel.')
 end
 
+% normalize the normal vector to a unit vector
+magnitude = norm(normal);
+normal = normal ./ magnitude;
+
 end
