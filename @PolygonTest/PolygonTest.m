@@ -4,6 +4,14 @@ classdef PolygonTest < matlab.unittest.TestCase
     properties
     end
     
+    properties(Constant)
+        % The maximum acceptable magnitude for the cross product of two
+        % parallel unit vectors.
+        % Set to sin(1e-9) to set the threshold to vectors off by 1e-9
+        % radians.
+        PARALLEL_TOLERANCE = sin(1e-9); 
+    end
+    
     methods(Test)
         %% Constructor tests
         function testConstructorHappy(testcase)
@@ -56,6 +64,38 @@ classdef PolygonTest < matlab.unittest.TestCase
         end % function testToMatrixHappy
         
         %% getPlane()
+        function testGetPlaneAndGenPolygonCoordMatrix(tc)            
+            [coords, orig_point, orig_normal] = ...
+                PolygonTest.genPolygonCoordMatrix();
+            pg = Polygon(coords(:,1), coords(:,2), coords(:,3));
+            
+            [test_point, test_normal] = pg.getPlane();
+            
+            % normalize both orig_normal and test_normal to unit length.
+            % This allows us to accept a tolerance for how parallel they
+            % are.
+            orig_normal = orig_normal ./ norm(orig_normal);
+            test_normal = test_normal ./ norm(test_normal);
+            
+            % Verify that the normals are parallel.
+            tc.verifyLessThan(norm(cross(orig_normal,test_normal)), ...
+                PolygonTest.PARALLEL_TOLERANCE);
+            
+            % Verify that test_point is on the original plane.
+            displacement = test_point - orig_point;
+            if(norm(displacement) > 0)
+                % If the displacement has 0 magnitude, we can't normalize
+                % it; but then they're the same point, so the test point is
+                % on the original plane. 
+                
+                % normalize the displacement vector to unit length;
+                displacement = displacement ./ norm(displacement);
+                
+                tc.verifyLessThan(dot(displacement, orig_normal), ...
+                    PolygonTest.PARALLEL_TOLERANCE);
+            end
+        end % function testGetPlaneAndGenPolygonCoordMatrix
+        
         function testGetPlaneAgainstOld(tc)
             
         end % function testGetPlaneAgainstOld
