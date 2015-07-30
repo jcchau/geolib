@@ -11,6 +11,7 @@ classdef Polygon
     
     methods
         function obj = Polygon(x, y, z)
+            
             % Only basic error-checking
             if(length(x) ~= length(y) || length(x) ~= length(z))
                 error('Error: Number vertices in x, y, and z dimensions don''t match.');
@@ -29,7 +30,9 @@ classdef Polygon
         
         vertices = toMatrix(obj)
         
+        % I recommend using getPlane instead of getPlane_old.
         [point, normal] = getPlane(obj)
+        [point, normal] = getPlane_old(obj)
         
         a = area(obj)
     end
