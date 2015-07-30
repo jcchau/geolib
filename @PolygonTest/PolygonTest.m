@@ -63,19 +63,25 @@ classdef PolygonTest < matlab.unittest.TestCase
     end % methods(Test)
     
     methods(Static)
-        function coords = genPolygonCoordMatrix()
+        function [coords, point, normal] = genPolygonCoordMatrix()
             % genPolygonCoordMatrix generates a random polygon.
             %
-            %   COORDS = genPolygonCoordMatrix()
+            %   [COORDS, CENTER, NORMAL] = genPolygonCoordMatrix()
             %
             %   COORDS is a NUMVERTICES x 3 matrix, where each of the
             %       NUMVERTICES rows represents a vertex and the columns
             %       represent the x, y, and z coordinates respectively.
             %       This should be identical to the format returned by
             %       Polygon.toMatrix().
+            %
+            %   POINT and NORMAL define the plane on which the polygon
+            %       lies, where POINT is a point on the plane and NORMAL is
+            %       the normal vector.
             numvertices = randi([3,10]);
-                        
-            center = rand(1,3) - 0.5;
+            
+            % Divide by ramd() so center is not necessarily constrained to
+            % have x,y, and z coordinates between +/-0.5.
+            center = (rand(1,3) - 0.5)./rand();
             
             % Generate the axes of the plane on which the polygon lies
             axisA = rand(1,3) - 0.5;
@@ -88,6 +94,12 @@ classdef PolygonTest < matlab.unittest.TestCase
             % normalize axis B
             axisB = axisB ./ norm(axisB);
             
+            %% Calculate the return values to describe the plane
+            point = center;
+            % calculate the normal vector since this will make tests for
+            % getPlane() easier.
+            normal = cross(axisA, axisB);
+            
             %% generate a 2D shape
             
             % randomly divide 2*pi radians into numvertices parts
@@ -96,8 +108,9 @@ classdef PolygonTest < matlab.unittest.TestCase
                 sum(angle_proportions) .* 2*pi;
             angle = cumsum(angle_proportions);
             
-            % generate a random radius
-            radius = rand(numvertices,1);
+            % generate a random radius.
+            % Divide by rand() so we're not constrained to radii < 1.
+            radius = rand(numvertices,1) ./ rand();
             
             % convert this to the 2D shape in (a,b) coordinates.
             a = radius .* cos(angle);
@@ -108,11 +121,6 @@ classdef PolygonTest < matlab.unittest.TestCase
             coords = repmat(center, numvertices, 1) + ...
                 repmat(a,1,3) .* repmat(axisA, numvertices, 1) + ...
                 repmat(b,1,3) .* repmat(axisB, numvertices, 1);
-            
-            %% enlarge the polygon
-            % The polygon is currently < 1 in every dimension.
-            % Enlarge by a random factor > 1.
-            coords = coords ./ rand();
         end % function genPolygonMatrix
     end
 end
