@@ -23,14 +23,18 @@ edge_vectors = end_vertices - vertices;
 previous_edge = [edge_vectors(end,:); edge_vectors(1:end-1,:)];
 next_edge = edge_vectors;
 
-all_normals = cross(previous_edge, next_edge);
+% In case we have a triangle (with 3 rows, specify that we want to perform
+% the cross product one column (i.e., along dimension 2) at a time).  
+all_normals = cross(previous_edge, next_edge, 2);
 
 % Calculate the magnitude of each normal vector; assume the largest
 % cross-product gives us the most precise normal vector.  If the
 % cross-product is zero, then the edges are parallel.
 magnitudes = sqrt(...
     all_normals(:,1).^2 + all_normals(:,2).^2 + all_normals(:,3).^2);
-chosen_normal = find(magnitudes==max(magnitudes));
+% In case the magnitudes are equal (which is always for triangles), only
+% pick one.
+chosen_normal = find(magnitudes==max(magnitudes),1);
 
 if(magnitudes(chosen_normal) == 0)
     error('Error: Error: All edges of the polygon are parallel.')
