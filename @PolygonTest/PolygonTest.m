@@ -97,7 +97,32 @@ classdef PolygonTest < matlab.unittest.TestCase
         end % function testGetPlaneAndGenPolygonCoordMatrix
         
         function testGetPlaneAgainstOld(tc)
+            % testGetPlaneAgainstOld uses old method getPlane_old to check
+            %   method getPlane.
             
+            [coords, ~, ~] = PolygonTest.genPolygonCoordMatrix();
+            
+            pg = Polygon(coords(:,1), coords(:,2), coords(:,3));
+            
+            [test_point, test_normal] = pg.getPlane();
+            [ref_point, ref_normal] = pg.getPlane_old();
+            
+            % normalize both normal vectors
+            test_normal = test_normal ./ norm(test_normal);
+            ref_normal = ref_normal ./ norm(ref_normal);
+            
+            % verify that the normals are parallel
+            tc.verifyLessThan(norm(cross(ref_normal, test_normal)), ...
+                PolygonTest.PARALLEL_TOLERANCE);
+            
+            % verify that the test point is on the reference plane
+            displacement = test_point - ref_point;
+            if(norm(displacement) > 0)
+                displacement = displacement ./ norm(displacement);
+                
+                tc.verifyLessThan(dot(displacement, ref_normal), ...
+                    PolygonTest.PARALLEL_TOLERANCE);
+            end
         end % function testGetPlaneAgainstOld
         
     end % methods(Test)
