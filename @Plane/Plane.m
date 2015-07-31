@@ -72,7 +72,7 @@ classdef Plane
                     % the distance between the obj.point and planeB.point.
                     displacement = displacement ./ norm(displacement);
                     
-                    if(dot(displacement, obj.normal) < ...
+                    if(abs(dot(displacement, obj.normal)) < ...
                             Plane.PARALLEL_TOLERANCE)
                         result = true;
                     else
