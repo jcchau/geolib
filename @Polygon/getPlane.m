@@ -1,12 +1,11 @@
-function [point, normal] = getPlane(obj)
-% getPlane returns the point and normal vector that describes the plane on
-%   which the polygon lies.
+function plane = getPlane(obj)
+% getPlane returns a Plane object that describes the plane on which the
+%   polygon lies. 
 %
-%   [POINT, NORMAL] = getPlane(OBJ)
+%   PLANE = getPlane(OBJ)
 %
 %   OBJ is the Polygon object.
-%   POINT is a point on the polygon's plane.
-%   NORMAL is the unit normal vector.
+%   PLANE is a Plane object.
 
 vertices = obj.toMatrix();
 
@@ -40,8 +39,9 @@ if(magnitudes(chosen_normal) == 0)
     error('Error: Error: All edges of the polygon are parallel.')
 end
 
-% Normalize the chosen normal vector to unit length
-normal = all_normals(chosen_normal,:) ./ magnitudes(chosen_normal);
+% Generate the Plane object to return, where the normal is
+% all_normals(chosen_normal,:).
+plane = Plane(point, all_normals(chosen_normal,:));
 
 end
 

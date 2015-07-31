@@ -31,7 +31,7 @@ classdef Polygon
         vertices = toMatrix(obj)
         
         % I recommend using getPlane instead of getPlane_old.
-        [point, normal] = getPlane(obj)
+        plane = getPlane(obj)
         [point, normal] = getPlane_old(obj)
         
         a = area(obj)
