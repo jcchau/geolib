@@ -3,15 +3,7 @@ classdef PolygonTest < matlab.unittest.TestCase
     
     properties
     end
-    
-    properties(Constant)
-        % The maximum acceptable magnitude for the cross product of two
-        % parallel unit vectors.
-        % Set to sin(1e-9) to set the threshold to vectors off by 1e-9
-        % radians.
-        PARALLEL_TOLERANCE = sin(1e-9); 
-    end
-    
+        
     methods(Test)
         %% Constructor tests
         function testConstructorHappy(testcase)
