@@ -46,6 +46,16 @@ classdef PlaneTest < matlab.unittest.TestCase
             tc.verifyTrue(isequal(plane.normal, newnormal));
         end % function testSetNormalHappy
         
+        function testPropertyNormalIsUnitVector(tc)
+            point = (rand(1,3)-0.5)./rand();
+            normal = (rand(1,3)-0.5)./rand();
+            plane = Plane(point, normal);
+            
+            magnitude = norm(plane.normal);
+            
+            tc.verifyEqual(magnitude, 1, 'AbsTol', 1e-15);
+        end % function testPropertyNormalIsUnitVector
+        
         %% isEqual
         function testIsEqualIdentical(tc)
             point = (rand(1,3)-0.5)./rand();

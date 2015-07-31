@@ -5,6 +5,9 @@ classdef Plane
     
     properties
         point
+        
+        % Property normal is always normalized to a unit vector by the set
+        % property access method. 
         normal
     end
     
