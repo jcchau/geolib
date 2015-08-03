@@ -81,6 +81,32 @@ classdef PolygonTest < matlab.unittest.TestCase
             tc.verifyTrue(ref_plane.isEqual(test_plane));
         end % function testGetPlaneAgainstOld
         
+        function testGetPlaneGeneratedAxes(tc)
+            % Want cross(axisA,axisB) to equal normal.
+            
+            [coords, ~] = PolygonTest.genPolygonCoordMatrix();
+            pg = Polygon(coords(:,1), coords(:,2), coords(:,3));
+
+            [plane, axisA, axisB] = pg.getPlane();
+            
+            % check that each axis is normal
+            tc.verifyEqual(norm(axisA), 1, 'AbsTol', 1e-15);
+            tc.verifyEqual(norm(axisB), 1, 'AbsTol', 1e-15);
+            
+            % check that the axes are orthogonal to each other
+            tc.verifyEqual(dot(axisA, axisB), 0, 'AbsTol', 1e-15);
+            
+            % and check that both axes are orthogonal to the normal.
+            tc.verifyEqual(dot(axisA, plane.normal), 0, 'AbsTol', 1e-15);
+            tc.verifyEqual(dot(axisB, plane.normal), 0, 'AbsTol', 1e-15);
+            
+            % and finally, check that cross(axisA, axisB) points in the
+            % direction of normal.
+            axisC = cross(axisA, axisB);
+            deviation = axisC - plane.normal;
+            tc.verifyLessThan(norm(deviation), 1e-15);
+        end % function testGetPlaneGeneratedAxes
+        
     end % methods(Test)
     
     methods(Static)
