@@ -22,6 +22,9 @@ classdef Polygon
             % Additional error checking omitted for performance:
             %   - That the points don't all lie on a line.
             %   - That all of the points are on the same plane.
+            %   - That consecutive vertices aren't repetitions.
+            %   - That the edges of the polygon don't cross.
+            %   - That the polygon is convex.
             
             obj.x = x(:);
             obj.y = y(:);
