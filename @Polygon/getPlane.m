@@ -1,11 +1,13 @@
-function plane = getPlane(obj)
+function [plane, axisA, axisB] = getPlane(obj)
 % getPlane returns a Plane object that describes the plane on which the
 %   polygon lies. 
 %
-%   PLANE = getPlane(OBJ)
+%   [PLANE, AXISA, AXISB] = getPlane(OBJ)
 %
 %   OBJ is the Polygon object.
 %   PLANE is a Plane object.
+%
+%   AXISA and AXISB are orthonormal axes on the plane.
 
 vertices = obj.toMatrix();
 
@@ -43,5 +45,14 @@ end
 % all_normals(chosen_normal,:).
 plane = Plane(point, all_normals(chosen_normal,:));
 
-end
+%% Calculate a set of orthonormal axes (axisA and axisB) to return
+axisA = previous_edge(chosen_normal,:);
+axisB = next_edge(chosen_normal,:);
+% normalize axisA
+axisA = axisA ./ norm(axisA);
+% orthogonalize axisB
+axisB = axisB - axisA .* dot(axisB, axisA);
+% normalize axisB
+axisB = axisB ./ norm(axisB);
 
+end
