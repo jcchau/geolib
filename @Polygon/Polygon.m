@@ -10,6 +10,8 @@ classdef Polygon
     end
     
     methods
+        
+        %% constructor
         function obj = Polygon(x, y, z)
             
             % Only basic error-checking
@@ -29,9 +31,12 @@ classdef Polygon
             obj.x = x(:);
             obj.y = y(:);
             obj.z = z(:);
-        end
+        end % function Polygon
         
+        %% methods defined in separate files
         vertices = toMatrix(obj)
+        
+        [a, b, origin, axisA, axisB] = to2D(obj)
         
         % I recommend using getPlane instead of getPlane_old.
         [plane, axisA, axisB] = getPlane(obj)
