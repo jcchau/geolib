@@ -94,17 +94,17 @@ classdef PolygonTest < matlab.unittest.TestCase
             tc.verifyEqual(norm(axisB), 1, 'AbsTol', 1e-15);
             
             % check that the axes are orthogonal to each other
-            tc.verifyEqual(dot(axisA, axisB), 0, 'AbsTol', 1e-15);
+            tc.verifyEqual(dot(axisA, axisB), 0, 'AbsTol', 1e-13);
             
             % and check that both axes are orthogonal to the normal.
-            tc.verifyEqual(dot(axisA, plane.normal), 0, 'AbsTol', 1e-15);
-            tc.verifyEqual(dot(axisB, plane.normal), 0, 'AbsTol', 1e-15);
+            tc.verifyEqual(dot(axisA, plane.normal), 0, 'AbsTol', 1e-13);
+            tc.verifyEqual(dot(axisB, plane.normal), 0, 'AbsTol', 1e-13);
             
             % and finally, check that cross(axisA, axisB) points in the
             % direction of normal.
             axisC = cross(axisA, axisB);
             deviation = axisC - plane.normal;
-            tc.verifyLessThan(norm(deviation), 1e-15);
+            tc.verifyLessThan(norm(deviation), 1e-13);
         end % function testGetPlaneGeneratedAxes
         
         %% to2D
@@ -127,7 +127,7 @@ classdef PolygonTest < matlab.unittest.TestCase
             tc.verifyEqual(norm(axisA), 1, 'AbsTol', 1e-15);
             tc.verifyEqual(norm(axisB), 1, 'AbsTol', 1e-15);
             
-            tc.verifyEqual(dot(axisA, axisB), 0, 'AbsTol', 1e-15);
+            tc.verifyEqual(dot(axisA, axisB), 0, 'AbsTol', 1e-13);
             
             %% check that the 2D coordinates are the same points
             numvertices = size(coords, 1);
@@ -143,7 +143,7 @@ classdef PolygonTest < matlab.unittest.TestCase
             % let the test pass if each deviation vector has a magnitude
             % less than a tolerance of 1e-14.
             for index=1:numvertices
-                tc.verifyLessThan(norm(deviation(index,:)), 1e-14);
+                tc.verifyLessThan(norm(deviation(index,:)), 1e-13);
             end
             
         end % function testTo2D(tc)
@@ -179,7 +179,7 @@ classdef PolygonTest < matlab.unittest.TestCase
             expected_area = polyarea(x, y);
             test_area = pg.area();
             
-            tc.verifyEqual(test_area, expected_area, 'RelTol', 1e-14);
+            tc.verifyEqual(test_area, expected_area, 'RelTol', 1e-13);
         end % function testAreaAgainstOriginal2DPolygon
         
     end % methods(Test)
