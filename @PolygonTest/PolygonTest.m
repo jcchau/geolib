@@ -16,6 +16,24 @@ classdef PolygonTest < matlab.unittest.TestCase
             end
         end % function testConstructorHappy
         
+        function testConstructorSingleCoordinateMatrix(testcase)
+            % testConstructorSingleCoordinateMatrix verifies that the
+            %   constructor accepts the vertices as a single matrix.  
+            
+            coords = PolygonTest.genPolygonCoordMatrix();
+            
+            try
+                pg = Polygon(coords);
+            catch
+                testcase.fatalAssertFail();
+            end
+            
+            % Verify that the single coordinate matrix input is interpreted
+            % correctly.
+            readback = pg.toMatrix();
+            testcase.verifyTrue(isequal(readback, coords));            
+        end % function testConstructorSingleCoordinateMatrix
+        
         function testConstructorTwoVertices(testcase)
             try
                 Polygon([0 1]', [0 1]', [0 2]');
