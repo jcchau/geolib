@@ -23,7 +23,7 @@ vertices = obj.toMatrix();
 origin = plane.point;
 
 % Convert vertices to be in terms of the new origin
-vertices = vertices - origin;
+vertices = vertices - repmat(origin, size(vertices, 1), 1);
 
 % Get coordinates along axisA and axisB (which are already normalized).
 % Equivalent to taking the dot product of each row of matrix vertices
