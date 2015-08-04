@@ -140,12 +140,29 @@ classdef PolygonTest < matlab.unittest.TestCase
             deviation = testCoords - coords;
             
             % let the test pass if each deviation vector has a magnitude
-            % less than a tolerance of 1e-15.
+            % less than a tolerance of 1e-14.
             for index=1:numvertices
-                tc.verifyLessThan(norm(deviation(index,:)), 1e-15);
+                tc.verifyLessThan(norm(deviation(index,:)), 1e-14);
             end
             
         end % function testTo2D(tc)
+        
+        function testAreaRect3452(tc)
+            % testAreaRect3452 Uses a 5x2 rectangle to test Polygon.area.
+            %
+            %   The rectangle used is a 5 by 2 rectangle.  The edge of
+            %   length 5 is formed as the hypotenuse of a 3,4,5 triange on
+            %   the y-z plane with the right-angle corner at the origin, 3
+            %   along the z axis, and 4 along the y axis.  The side of
+            %   length 2 runs parallel to the x axis.  
+            %
+            %   The calculated area should be 5*2 = 10.
+            
+            pg = Polygon([2 0 0 2], [0 0 4 4], [3 3 0 0]);
+            test_area = pg.area();
+            
+            tc.verifyEqual(test_area, 10, 'AbsTol', 1e-15);
+        end % function testAreaRect3452
         
     end % methods(Test)
     
