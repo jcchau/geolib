@@ -24,8 +24,11 @@ classdef Plane
         %% Constructors
         function obj = Plane(point, normal)
             % Constructor
-            obj.point = point;
-            obj.normal = normal;
+            
+            if(nargin>0)    % for the no input argument case
+                obj.point = point;
+                obj.normal = normal;
+            end
         end % function Plane
         
         %% Property access methods
