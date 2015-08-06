@@ -126,6 +126,22 @@ classdef PlaneTest < matlab.unittest.TestCase
             
             tc.verifyFalse(planeA.isEqual(planeB));
         end % function testIsEqualDifferentPoint
+        
+        %% d
+        function testD(tc)
+            % testD verifies that the value returned by Plane.D is equal to
+            % p for the Hessian normal form of a plane as described in
+            % http://mathworld.wolfram.com/Plane.html. 
+            
+            point = (rand(1,3)-0.5)./rand();
+            normal = rand(1,3)-0.5;
+            plane = Plane(point, normal);
+            
+            test_p = plane.d();
+            
+            expected_p = -dot(point, normal./norm(normal));
+            tc.verifyEqual(test_p, expected_p, 'AbsTol', 1e-15);
+        end % function testD
     end % methods(Test)
     
 end

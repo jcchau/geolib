@@ -87,6 +87,26 @@ classdef Plane
                 end
             end
         end % function isEqual
+        
+        function p = d(obj)
+            % d returns the value of d for the general plane equation:
+            %   ax+by+cz+d=0
+            % or
+            %   dot(point, normal) + d = 0
+            % where point is any point on the plane and normal is the
+            % normal vector. 
+            %
+            % Since normal is stored as a unit vector in Plane, d is also
+            % equal to p in the Hessian normal form of a plane as described
+            % in http://mathworld.wolfram.com/HessianNormalForm.html.
+            %
+            % P = D(OBJ)
+            
+            p = -dot(obj.point, obj.normal);
+        end % function d
+        
+        [intersection, ray_intersects, is_parallel] = ...
+            intersectRay(obj, point, direction)
     end
     
 end
