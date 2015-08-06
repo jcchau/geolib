@@ -159,7 +159,7 @@ classdef PolygonTest < matlab.unittest.TestCase
             deviation = testCoords - coords;
             
             % let the test pass if each deviation vector has a magnitude
-            % less than a tolerance of 1e-14.
+            % less than a tolerance of 1e-13.
             for index=1:numvertices
                 tc.verifyLessThan(norm(deviation(index,:)), 1e-13);
             end
