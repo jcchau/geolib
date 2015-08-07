@@ -173,13 +173,62 @@ classdef PlaneTest < matlab.unittest.TestCase
             test_intersection = ...
                 plane.intersectRay(ray_start, ray_direction);
             
+            % verify that intersectRay returns nrays rows
+            tc.verifyEqual(size(test_intersection), [nrays, 3]);
+            
             % verify that each test_intersection is approximately equal to
             % each actual intersection.
             deviation = test_intersection - intersection;
             for index=1:nrays
-                tc.verifyLessThan(norm(deviation(index,:)), 1e-13);
+                tc.verifyLessThan(norm(deviation(index,:)), 1e-8);
             end % for index=1:nrays
         end % function testIntersectRayFindsIntersections
+        
+        function testIntersectRaySomeDontIntersect(tc)
+            % testIntersectRaySomeDontIntersect verifies that
+            % Plane.intersectRay correctly determines which rays intersect
+            % the plane.
+            
+            nrays = randi([0,10]);
+            [axisA, axisB, plane_anchor] = PlaneTest.genPlaneAxes();
+            intersection = PlaneTest.genPlanePoints(...
+                axisA, axisB, plane_anchor, nrays);
+            
+            plane = Plane(plane_anchor, cross(axisA, axisB));
+            
+            % generate the starting points for the rays
+            ray_start = (rand(nrays,3)-0.5) ./ rand(nrays,3);
+            
+            ray_direction = intersection - ray_start;
+            
+            % randomly pick some rays to point away from the plane (i.e.,
+            % no intersection)
+            flipped_away = rand(nrays,1) > 0.5;
+            
+            ray_direction(flipped_away,:) = -ray_direction(flipped_away,:);
+            
+            [test_intersections, test_does_intersect] = ...
+                plane.intersectRay(ray_start, ray_direction);
+            
+            % verify that intersectRay returns nrays rows
+            tc.verifyEqual(size(test_intersections), [nrays, 3]);
+            tc.verifyEqual(size(test_does_intersect), [nrays, 1]);
+            
+            % Check that intersectRay detects that
+            %   - all rays that aren't flipped to point away do intersect
+            %   and that
+            %   - all rays that are flipped to point away do not intersect.
+            tc.verifyTrue(all(test_does_intersect == ~flipped_away));
+            
+            % also check to make sure that including rays that don't
+            % intersect won't mess up the detection of the intersection
+            % point for rays that do intersect.
+            deviation = test_intersections(~flipped_away,1) - ...
+                intersection(~flipped_away,1);
+            for index = 1:size(deviation,1)
+                tc.verifyLessThan(norm(deviation(index,:)), 1e-8);
+            end
+        end % function testIntersectRaySomeDontIntersect
         
     end % methods(Test)
     
