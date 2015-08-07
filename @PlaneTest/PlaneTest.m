@@ -142,7 +142,72 @@ classdef PlaneTest < matlab.unittest.TestCase
             expected_p = -dot(point, normal./norm(normal));
             tc.verifyEqual(test_p, expected_p, 'AbsTol', 1e-15);
         end % function testD
+        
+        %% intersectRay
+        function testIntersectRayFindsIntersections(tc)
+            % testIntersectRayFindsIntersection picks nrays points on a
+            % plane, generates nrays rays through that point, and checks
+            % that intersectRay finds the intersections.  
+            
+            % want intersectRay to not throw errors if no rays are
+            % provided.
+            nrays = randi([0,5]);
+            
+            % generate orthonormal plane axes
+            [axisA, axisB, plane_point] = PlaneTest.genPlaneAxes();
+            plane = Plane(plane_point, cross(axisA, axisB));
+            
+            % pick the intersection points
+            intersection = PlaneTest.genPlanePoints(...
+                axisA, axisB, plane_point, nrays);
+            
+            % generate a starting point for the ray
+            ray_start = (rand(nrays,3)-0.5) ./ rand(nrays,3);
+            
+            ray_direction = intersection - ray_start;
+            % randomly scale ray_direction
+            direction_scale_factor = rand(nrays,1) ./ rand(nrays,1);
+            ray_direction = ray_direction .* ...
+                repmat(direction_scale_factor, 1, 3);
+            
+            test_intersection = ...
+                plane.intersectRay(ray_start, ray_direction);
+            
+            % verify that each test_intersection is approximately equal to
+            % each actual intersection.
+            deviation = test_intersection - intersection;
+            for index=1:nrays
+                tc.verifyLessThan(norm(deviation(index,:)), 1e-13);
+            end % for index=1:nrays
+        end % function testIntersectRayFindsIntersections
+        
     end % methods(Test)
     
+    methods(Static)
+        function [axisA, axisB, anchor_point] = genPlaneAxes()
+            % genPlaneAxes generates a random pair of orthonormal axes.
+            % generate orthonormal plane axes
+            axisA = rand(1,3)-0.5;
+            axisA = axisA ./ norm(axisA);
+            axisB = rand(1,3)-0.5;
+            axisB = axisB - axisA * dot(axisB, axisA);
+            axisB = axisB ./ norm(axisB);
+            
+            % pick a point for the plane
+            anchor_point = (rand(1,3)-0.5)./rand();
+        end
+        
+        function points = ...
+                genPlanePoints(axisA, axisB, anchor_point, npoints)
+            % genPlanePoints generates random points on the plane defined
+            % by axisA, axisB, and anchor_point.
+            
+            a = (rand(npoints,1) - 0.5) ./ rand(npoints,1);
+            b = (rand(npoints,1) - 0.5) ./ rand(npoints,1);
+            points = repmat(a,1,3) .* repmat(axisA, npoints, 1) + ...
+                repmat(b,1,3) .* repmat(axisB, npoints, 1) + ...
+                repmat(anchor_point, npoints, 1);
+        end
+    end
 end
 
