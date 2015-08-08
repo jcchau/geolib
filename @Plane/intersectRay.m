@@ -47,7 +47,7 @@ end
 
 % The magnitude of the direction vector(s).
 % Also used later to normalize the direction vectors. 
-direction_magnitude = sum(direction.^2, 2);
+direction_magnitude = sqrt(sum(direction.^2, 2));
 
 % The calling function may accidentally have a direction vector with zero
 % magnitude if it were calculating the direction vector with a second point
@@ -75,6 +75,6 @@ ray_intersects = t>=0;
 % direction vector and the plane's normal.
 normal_component = (direction * obj.normal') ./ direction_magnitude;
 
-is_parallel = (normal_component < Plane.PARALLEL_TOLERANCE);
+is_parallel = (abs(normal_component) < Plane.PARALLEL_TOLERANCE);
 
 end

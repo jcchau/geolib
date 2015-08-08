@@ -230,6 +230,55 @@ classdef PlaneTest < matlab.unittest.TestCase
             end
         end % function testIntersectRaySomeDontIntersect
         
+        function testIntersectRaySomeParallel(tc)
+            % testIntersectRaySomeParallel verifies that Plane.intersect
+            % correctly identifies and handles parallel rays.
+            
+            nrays = randi([0,10]);
+            [axisA, axisB, plane_anchor] = PlaneTest.genPlaneAxes();
+            intersection = PlaneTest.genPlanePoints(...
+                axisA, axisB, plane_anchor, nrays);
+            
+            plane = Plane(plane_anchor, cross(axisA, axisB));
+            
+            ray_start = (rand(nrays,3)-0.5) ./ rand(nrays,3);
+            
+            % generate a random direction parallel to the plane
+            parallel_a = (rand(nrays,1) - 0.5) ./ ...
+                rand(nrays,1);
+            parallel_b = (rand(nrays,1) - 0.5) ./ ...
+                rand(nrays,1);
+            parallel_direction = ...
+                repmat(parallel_a,1,3) .* repmat(axisA, nrays, 1) + ...
+                repmat(parallel_b,1,3) .* repmat(axisB, nrays, 1);
+            
+            % randomly make about half of the rays parallel
+            set_parallel = rand(nrays,1) > 0.5;
+            
+            % Ensure that ray_direction has 3 columns (even if nrays is 0).
+            ray_direction = zeros(nrays,3);
+            
+            ray_direction(~set_parallel,:) = ...
+                intersection(~set_parallel,:) - ray_start(~set_parallel,:);
+            ray_direction(set_parallel,:) = ...
+                parallel_direction(set_parallel,:);
+            
+            % use the method under test
+            [test_intersection, ~, is_parallel] = ...
+                plane.intersectRay(ray_start, ray_direction);
+            
+            % verify that the parallel rays were correctly detected
+            tc.verifyTrue(isequal(is_parallel, set_parallel));
+            
+            % and check that the intersections of rays that aren't parallel
+            % are still found.  
+            deviation = test_intersection(~set_parallel) - ...
+                intersection(~set_parallel);
+            for index = 1:size(deviation,1)
+                tc.verifyLessThan(norm(deviation(index,:)), 1e-8);
+            end
+        end % function testIntersectRaySomeParallel
+        
     end % methods(Test)
     
     methods(Static)
