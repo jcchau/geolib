@@ -166,6 +166,8 @@ classdef RectangularArray
         vector = normal(obj)
 
         indices = listIntersectingElements(obj, polygon)
+        
+        polygon = getPolygon(obj, ix, iy)
     end % methods
     
 end
