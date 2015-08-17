@@ -60,8 +60,7 @@ classdef RectangularArray
             
             if(nargin>0)
                 obj.centerpoint = centerpoint;
-                obj.axis_horizontal = axis_horizontal;
-                obj.axis_vertical = axis_vertical;
+                obj.setAxes(axis_horizontal, axis_vertical);
                 obj.element_width = element_width;
                 obj.element_height = element_height;
                 obj.nrows = nrows;
