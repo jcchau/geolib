@@ -7,6 +7,42 @@ classdef RectangularArrayTest < matlab.unittest.TestCase
     methods(Test)
         %% Constructor
         function testConstructorHappy(tc)
+            [centerpoint, axis_horizontal, axis_vertical, ...
+                element_width, element_height, nrows, ncols] = ...
+                RectangularArrayTest.genRandRectangularArrayParams();
+            
+            polygon = [ 0, 0, 0; ...
+                element_width, 0, 0; ...
+                0, element_height, 0 ];
+            
+            RectangularArray( ...
+                centerpoint, axis_horizontal, axis_vertical, ...
+                element_width, element_height, nrows, ncols, ...
+                polygon);
+        end % function testConstructorHappy
+        
+        %% Property access methods
+        
+        %% normal
+        
+        
+    end % methods(Test)
+    
+    methods(Static)
+        function r = randnum(rows, columns)
+            % randnum returns a random.
+            % Unlike rand, which picks from [0,1), r may be positive,
+            % negative, zero, and may exceed 1.
+            r = (rand(rows, columns)-0.5) ./ rand(rows, columns);
+        end % function randnum
+        
+        function [centerpoint, axis_horizontal, axis_vertical, ...
+                element_width, element_height, nrows, ncols] = ...
+                genRandRectangularArrayParams()
+            % genRandRectangularArrayParams returns a random set of
+            % parameters that can be used to instantiate a RectangularArray
+            % object.
+            
             centerpoint = RectangularArrayTest.randnum(1,3);
             
             % generate orthonormal axes
@@ -24,26 +60,7 @@ classdef RectangularArrayTest < matlab.unittest.TestCase
             nrows = randi(5);
             ncols = randi(5);
             
-            polygon = [ 0, 0, 0; ...
-                element_width, 0, 0; ...
-                0, element_height, 0 ];
-            
-            RectangularArray( ...
-                centerpoint, axis_horizontal, axis_vertical, ...
-                element_width, element_height, nrows, ncols, ...
-                polygon);
-        end % function testConstructorHappy
-        
-        %% Property access methods
-    end % methods(Test)
-    
-    methods(Static)
-        function r = randnum(rows, columns)
-            % randnum returns a random.
-            % Unlike rand, which picks from [0,1), r may be positive,
-            % negative, zero, and may exceed 1.
-            r = (rand(rows, columns)-0.5) ./ rand(rows, columns);
-        end % function randnum
+        end % function genRandRectangularArrayParams
     end % methods(Static)
     
 end
