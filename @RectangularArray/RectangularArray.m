@@ -115,7 +115,7 @@ classdef RectangularArray
         end % function set.element_height
         
         function obj = set.nrows(obj, newval)
-            if(newval <= 1)
+            if(newval < 1)
                 error('The array must have at least one element.');
             end
             
@@ -123,7 +123,7 @@ classdef RectangularArray
         end % function set.nrows
         
         function obj = set.ncols(obj, newval)
-            if(newval <= 1)
+            if(newval < 1)
                 error('The array must have at least one element.');
             end
             
@@ -156,7 +156,7 @@ classdef RectangularArray
                 error('The horizontal and vertical axes should be orthogonal to each other.');
             end
             
-            obj.axis_horizonal = axis_horizontal;
+            obj.axis_horizontal = axis_horizontal;
             obj.axis_vertical = axis_vertical;
         end % function setAxes
         
