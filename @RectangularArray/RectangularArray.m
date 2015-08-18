@@ -66,9 +66,18 @@ classdef RectangularArray
                 obj.nrows = nrows;
                 obj.ncols = ncols;
                 
-                if(isa(polygon_template, 'Polygon'))
+                if(nargin >= 8)
+                    % i.e., if polygon_template (the 8th argument) is
+                    % provided.
                     obj.polygon_template = polygon_template;
-                end
+                else
+                    % by default, have the polygon fill the element
+                    obj.polygon_template = Polygon( ...
+                        [0, 0, 0; ...
+                        element_width, 0, 0; ...
+                        element_width, element_height, 0; ...
+                        0, element_height, 0]);
+                end % if(nargin >= 8)
             end % if(nargin>0)
             
         end % function RectangularArray  (constructor)
