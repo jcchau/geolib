@@ -23,25 +23,48 @@ classdef RectangularArrayTest < matlab.unittest.TestCase
         
         %% Property access methods
         
-        %% normal
-        function testNormal(tc)
-            [centerpoint, plane_axes, ...
-                element_width, element_height, nrows, ncols] = ...
-                RectangularArrayTest.genRandRectangularArrayParams();
+        %% getPolygon
+        function testGetPolygonSimple(tc)
+            centerpoint = [-100 100 1];
+            oa = OrthogonalAxes([1 0 0], [0 1 0]);
+            element_width = 3;
+            element_height = 2;
+            nrows = 4;
+            ncols = 5;
             
-            ra = RectangularArray( ...
-                centerpoint, plane_axes, ...
+            ra = RectangularArray(centerpoint, oa, ...
                 element_width, element_height, nrows, ncols);
             
-            % verify that it is the normalized cross product of
-            % plane_axis.horizontal and plane_axis.vertical.
-            normal = cross(plane_axes.horizontal, plane_axes.vertical);
-            normal = normal ./ norm(normal);
+            %% for ix=1, iy=1
+            % poly11_expected calculated by pencil & paper
+            poly11_expected = [-107.5, 102, 1; ...
+                -104.5, 102, 1; ...
+                -104.5, 104, 1; ...
+                -107.5, 104, 1];
             
-            deviation = ra.plane_axes.normal() - normal;
+            poly11_test = ra.getPolygon(1,1).toMatrix();
+            tc.verifyTrue(isequal(poly11_test, poly11_expected), ...
+                'The returned polygon for ix=1, iy=1 does not match the expected polygon.');
             
-            tc.verifyEqual(norm(deviation), 0, 'AbsTol', 1e-10);
-        end % function testNormal
+            %% for ix=2, iy=3
+            poly23_expected = [-104.5, 98, 1; ...
+                -101.5, 98, 1; ...
+                -101.5, 100, 1; ...
+                -104.5, 100, 1];
+            poly23_test = ra.getPolygon(2,3).toMatrix();
+            tc.verifyTrue(isequal(poly23_test, poly23_expected), ...
+                'The returned polygon for ix=2, iy=3 does not match the expected polygon.');
+            
+            %% for ix=5, iy=4
+            poly54_expected = [-95.5, 96, 1; ...
+                -92.5, 96, 1; ...
+                -92.5, 98, 1; ...
+                -95.5, 98, 1];
+            poly54_test = ra.getPolygon(5,4).toMatrix();
+            tc.verifyTrue(isequal(poly54_test, poly54_expected), ...
+                'The returned polygon for ix=5, iy=5 does not match the expected polygon.');
+            
+        end % function testGetPolygonSimple
         
     end % methods(Test)
     

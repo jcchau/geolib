@@ -25,7 +25,9 @@ template(:,2) = template(:,2) + element_anchor_y;
 % finally, convert from the array's local coordinate system to the global
 % 3D coordinate system.
 
-array_basis = [ obj.axis_horizontal; obj.axis_vertical; obj.normal ];
+array_basis = [ obj.plane_axes.horizontal; ...
+    obj.plane_axes.vertical; ...
+    obj.plane_axes.normal() ];
 
 polygon_matrix = template * array_basis + ...
     repmat(obj.centerpoint, size(template, 1), 1);
