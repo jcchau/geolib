@@ -8,6 +8,11 @@ function polygon = getPolygon(obj, ix, iy)
 %   array.  
 % POLYGON is the polygon of the element at (IX,IY) in the array.
 
+if(ix<1 || iy<1 || ix>obj.ncols || iy>obj.nrows)
+    error('RectangularArray:IndexOutsideArray', ...
+        'The provided indices are outside of the rectangular array.');
+end
+
 % calculate where the template polygon goes wrt the array's coordinate
 % system.
 element_anchor_x = (ix-1 - obj.ncols/2) * obj.element_width;
