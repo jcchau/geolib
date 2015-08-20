@@ -7,16 +7,16 @@ classdef RectangularArrayTest < matlab.unittest.TestCase
     methods(Test)
         %% Constructor
         function testConstructorHappy(tc)
-            [centerpoint, axis_horizontal, axis_vertical, ...
+            [centerpoint, plane_axes, ...
                 element_width, element_height, nrows, ncols] = ...
                 RectangularArrayTest.genRandRectangularArrayParams();
             
-            polygon = [ 0, 0, 0; ...
+            polygon = Polygon([ 0, 0, 0; ...
                 element_width, 0, 0; ...
-                0, element_height, 0 ];
+                0, element_height, 0 ]);
             
             RectangularArray( ...
-                centerpoint, axis_horizontal, axis_vertical, ...
+                centerpoint, plane_axes, ...
                 element_width, element_height, nrows, ncols, ...
                 polygon);
         end % function testConstructorHappy
@@ -24,7 +24,24 @@ classdef RectangularArrayTest < matlab.unittest.TestCase
         %% Property access methods
         
         %% normal
-        
+        function testNormal(tc)
+            [centerpoint, plane_axes, ...
+                element_width, element_height, nrows, ncols] = ...
+                RectangularArrayTest.genRandRectangularArrayParams();
+            
+            ra = RectangularArray( ...
+                centerpoint, plane_axes, ...
+                element_width, element_height, nrows, ncols);
+            
+            % verify that it is the normalized cross product of
+            % plane_axis.horizontal and plane_axis.vertical.
+            normal = cross(plane_axes.horizontal, plane_axes.vertical);
+            normal = normal ./ norm(normal);
+            
+            deviation = ra.plane_axes.normal() - normal;
+            
+            tc.verifyEqual(norm(deviation), 0, 'AbsTol', 1e-10);
+        end % function testNormal
         
     end % methods(Test)
     
@@ -36,7 +53,7 @@ classdef RectangularArrayTest < matlab.unittest.TestCase
             r = (rand(rows, columns)-0.5) ./ rand(rows, columns);
         end % function randnum
         
-        function [centerpoint, axis_horizontal, axis_vertical, ...
+        function [centerpoint, plane_axes, ...
                 element_width, element_height, nrows, ncols] = ...
                 genRandRectangularArrayParams()
             % genRandRectangularArrayParams returns a random set of
@@ -53,6 +70,8 @@ classdef RectangularArrayTest < matlab.unittest.TestCase
             axis_vertical = axis_vertical - ...
                 axis_horizontal_normalized * dot(axis_vertical, ...
                 axis_horizontal_normalized);
+            
+            plane_axes = OrthogonalAxes(axis_horizontal, axis_vertical);
             
             element_width = rand()./rand();
             element_height = rand()./rand();
