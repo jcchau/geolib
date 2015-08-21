@@ -23,6 +23,6 @@ end
 
 local3D = points3D - repmat(obj.centerpoint, npoints, 1);
 
-points2D = local3D * [obj.axis_horizontal; obj.axis_vertical]';
+points2D = local3D * [obj.plane_axes.horizontal; obj.plane_axes.vertical]';
 
 end

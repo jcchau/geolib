@@ -66,6 +66,81 @@ classdef RectangularArrayTest < matlab.unittest.TestCase
             
         end % function testGetPolygonSimple
         
+        %% listIntersectingElements
+        function testListIntersectingElementsIncludesAll(tc)
+            % testListIntersectingElementsIncludesAll ensures that all of
+            % the intersecting elements are listed.  
+            
+            [centerpoint, plane_axes, element_width, element_height, ...
+                nrows, ncols] = ...
+                RectangularArrayTest.genRandRectangularArrayParams();
+            
+            ra = RectangularArray(centerpoint, plane_axes, ...
+                element_width, element_height, nrows, ncols);
+            
+            %% create a polygon that intersects this array
+            nvertices = randi([3,6]);
+            chord_angle_proportions = rand(nvertices, 1);
+            chord_angle = cumsum( 2*pi * chord_angle_proportions / ...
+                sum(chord_angle_proportions) );
+            
+            % Set r so that it is uniformly distributed from 0 to the
+            % longer of the array width or height.  
+            % This gives us a good probability of having vertices both
+            % inside and outside of the array.  
+            r_to_vertex = rand(nvertices, 1) * ...
+                max(element_width*ncols, element_height*nrows);
+            
+            poly_horiz = r_to_vertex .* cos(chord_angle);
+            poly_verti = r_to_vertex .* sin(chord_angle);
+            
+            intersecting_poly = [poly_horiz, poly_verti] * ...
+                [plane_axes.horizontal; plane_axes.vertical] + ...
+                repmat(centerpoint, nvertices, 1);
+            
+            %% use method under test to get intersections
+            test_element_list = ...
+                ra.listIntersectingElements(Polygon(intersecting_poly));
+            
+            %% check that all intersecting elements are listed
+            % For each element in the array,
+            %   - get the element's polygon
+            %   - convert the element's polygon to the same 2D coordinates
+            %   as in (poly_horiz, poly_verti)
+            %   - intersect the element's polygon against the polygon
+            %   (poly_horiz, poly_verti)
+            %   - if the intersection's area is greater than 0, verify that
+            %   the element is listed in test_element_list.
+            
+            % A counter of the number of intersecting elements checked.
+            % If this value is still 0 at the end, there's a mistake in
+            % this test.
+            num_intersecting_elements = 0;            
+            for iy = 1:nrows
+                for ix = 1:ncols
+                    element_poly = ra.getPolygon(ix, iy).toMatrix();
+                    element_poly = element_poly - ...
+                        repmat(centerpoint, size(element_poly, 1), 1);
+                    ep_horiz = element_poly * plane_axes.horizontal';
+                    ep_verti = element_poly * plane_axes.vertical';
+                    
+                    [overlap_x, overlap_y] = polybool('intersection', ...
+                        ep_horiz, ep_verti, poly_horiz, poly_verti);
+                    
+                    if(polyarea(overlap_x, overlap_y) > 0)
+                        num_intersecting_elements = ...
+                            num_intersecting_elements + 1;
+                        
+                        tc.verifyTrue(any(ismember(...
+                            test_element_list, [ix, iy], 'rows')), ...
+                            'Intersecting element is missing from the list.');
+                    end % if polyarea
+                end % for ix
+            end % for iy
+            
+            tc.assertGreaterThan(num_intersecting_elements, 0, ...
+                'Test did not check for any intersecting elements.');
+        end % function testListIntersectingElementsIncludesAll
     end % methods(Test)
     
     methods(Static)
