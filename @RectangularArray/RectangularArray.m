@@ -37,15 +37,6 @@ classdef RectangularArray
         polygon_template
     end % properties
     
-    properties(SetAccess = private)
-        %% Set these using method setAxes
-        % which validates that the axes are orthogonal
-        % local x axis unit vector
-        axis_horizontal
-        % local y axis unit vector
-        axis_vertical
-    end % properties(SetAccess = private)
-    
     methods
         %% Constructor
         function obj = RectangularArray( ...
