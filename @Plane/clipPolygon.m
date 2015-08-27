@@ -12,9 +12,10 @@ function [polyout, isvalid] = clipPolygon(obj, polyin)
 % Adapted from Kerosene/aboveMinZ.m
 
 vertices = polyin.toMatrix();
+num_vertices_in = size(vertices, 1);
 
 % determine which vertices are on the +normal side of the plane.
-keepvertex = ((vertices * obj.normal) + obj.d()) >= 0;
+keepvertex = ((vertices * obj.normal') + obj.d()) >= 0;
 
 if(~any(keepvertex))
     isvalid = false;
@@ -28,37 +29,38 @@ else
     isvalid = true;
     
     % Preallocate worst-case-size space for the output polygon.
-    polyout = zeros(floor(1.5*size(polyin,1)), 3);
+    polyout_vertices = zeros(floor(1.5*num_vertices_in), 3);
     
     % a count of the number of vertices out
     num_vertices_out = 0;
     
     % start with the previous vertex being the last polyin vertex
-    iprev = size(polyin,1);
+    iprev = num_vertices_in;
     
     % go through each input vertex
-    for ivertex = 1:size(polyin,1)
-        if(xor(keepvertex(ivertex), ~keepvertex(iprev)))
+    for ivertex = 1:num_vertices_in
+        if(xor(keepvertex(ivertex), keepvertex(iprev)))
             % The from iprev to ivertex crosses the plane.
             % Insert a vertex where the edge intersects the plane.
             num_vertices_out = num_vertices_out + 1;
-            [polyout(num_vertices_out,:), ~, ~] = obj.intersectRay(...
+            [polyout_vertices(num_vertices_out,:), ~, ~] = ...
+                obj.intersectRay( ...
                 vertices(iprev,:), ... % the point
                 vertices(ivertex,:) - vertices(iprev,:) ... % the direction
                 );            
-        end % if(xor(keepvertex(ivertex), ~keepvertex(iprev)))
+        end % if(xor(keepvertex(ivertex), keepvertex(iprev)))
         
         if(keepvertex(ivertex))
             num_vertices_out = num_vertices_out + 1;
-            polyout(num_vertices_out,:) = vertices(ivertex,:);
+            polyout_vertices(num_vertices_out,:) = vertices(ivertex,:);
         end % if(keepvertex(ivertex))
         
         % prepare for the next iteration of this loop
         iprev = ivertex;
     end % for ivertex
     
-    % finally, trim polyout to remove any extra allocated space
-    polyout = polyout(1:num_vertices_out, :);
+    % finally, trim polyout_vertices to remove any extra allocated space
+    polyout = Polygon(polyout_vertices(1:num_vertices_out, :));
     
 end % if(~any(keepvertex))
 

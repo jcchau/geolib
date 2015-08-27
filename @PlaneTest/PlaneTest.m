@@ -279,6 +279,48 @@ classdef PlaneTest < matlab.unittest.TestCase
             end
         end % function testIntersectRaySomeParallel
         
+        %% clipPolygon
+        function testClipPolygonTriangle(tc)
+            polygon = Polygon([0,0,1; 0,2,1; 2,0,1]);
+            plane = Plane([1,0,1], [1, 0, 1]);
+            
+            [test_polyout, isvalid] = plane.clipPolygon(polygon);
+            test_result = test_polyout.toMatrix();
+            
+            tc.verifyTrue(isvalid, ...
+                'The resulting clipped Polygon should be valid.');
+            
+            expected_result = [1,0,1; 1,1,1; 2,0,1];
+            
+            tc.verifyTrue(isequal(test_result, expected_result), ...
+                'The test_result polygon does not match the expected_result polygon.');
+            
+        end % testClipPolygonTriangle
+        
+        function testClipPolygonKeepAll(tc)
+            polygon = Polygon([0,0,0; 0,2,0; 2,0,0]);
+            plane = Plane([-1, -1, -1], [1,1,1]);
+            
+            [test_polyout, isvalid] = plane.clipPolygon(polygon);
+            test_result = test_polyout.toMatrix();
+            
+            tc.verifyTrue(isvalid, ...
+                'The resulting clipped Polygon should be valid.');
+            
+            tc.verifyTrue(isequal(test_result, polygon.toMatrix()), ...
+                'The polygon should be unchanged.');
+        end % function testClipPolygonKeepAll
+        
+        function testClipPolygonDiscardAll(tc)
+            polyin = Polygon([0,0,0; 0,2,0; 2,0,0]);
+            plane = Plane([0,0,1], [0,0,1]);
+            
+            [~, isvalid] = plane.clipPolygon(polyin);
+            
+            tc.verifyFalse(isvalid, ...
+                'The result should not be valid since the entire polygon is clipped away.');
+        end % function testClipPolygonDiscardAll
+        
     end % methods(Test)
     
     methods(Static)
