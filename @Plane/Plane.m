@@ -107,6 +107,8 @@ classdef Plane
         
         [intersection, ray_intersects, is_parallel] = ...
             intersectRay(obj, point, direction)
+        
+        [polyout, isvalid] = clipPolygon(obj, polyin)
     end
     
 end
