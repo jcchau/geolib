@@ -53,8 +53,8 @@ classdef RectangularArray
                 obj.nrows = nrows;
                 obj.ncols = ncols;
                 
-                if(nargin >= 8)
-                    % i.e., if polygon_template (the 8th argument) is
+                if(nargin >= 7)
+                    % i.e., if polygon_template (the 7th argument) is
                     % provided.
                     obj.polygon_template = polygon_template;
                 else
