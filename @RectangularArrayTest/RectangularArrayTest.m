@@ -15,11 +15,59 @@ classdef RectangularArrayTest < matlab.unittest.TestCase
                 element_width, 0, 0; ...
                 0, element_height, 0 ]);
             
-            RectangularArray( ...
+            obj = RectangularArray( ...
                 centerpoint, plane_axes, ...
                 element_width, element_height, nrows, ncols, ...
                 polygon);
+            
+            %% verify the properties
+            tc.verifyEqual(obj.centerpoint, centerpoint);
+            
+            tc.verifyEqual(obj.plane_axes.horizontal, ...
+                plane_axes.horizontal);
+            tc.verifyEqual(obj.plane_axes.vertical, ...
+                plane_axes.vertical);
+            
+            tc.verifyEqual(obj.element_width, element_width);
+            tc.verifyEqual(obj.element_height, element_height);
+            
+            tc.verifyEqual(obj.nrows, nrows);
+            tc.verifyEqual(obj.ncols, ncols);
+            
+            tc.verifyEqual(obj.polygon_template.toMatrix(), ...
+                polygon.toMatrix());
         end % function testConstructorHappy
+        
+        function testConstructorDefaultPolygon(tc)
+            [centerpoint, plane_axes, ...
+                element_width, element_height, nrows, ncols] = ...
+                RectangularArrayTest.genRandRectangularArrayParams();
+            
+            obj = RectangularArray( ...
+                centerpoint, plane_axes, ...
+                element_width, element_height, nrows, ncols);
+            
+            %% verify the properties
+            tc.verifyEqual(obj.centerpoint, centerpoint);
+            
+            tc.verifyEqual(obj.plane_axes.horizontal, ...
+                plane_axes.horizontal);
+            tc.verifyEqual(obj.plane_axes.vertical, ...
+                plane_axes.vertical);
+            
+            tc.verifyEqual(obj.element_width, element_width);
+            tc.verifyEqual(obj.element_height, element_height);
+            
+            tc.verifyEqual(obj.nrows, nrows);
+            tc.verifyEqual(obj.ncols, ncols);
+            
+            tc.verifyEqual(obj.polygon_template.toMatrix(), ...
+                [0, 0, 0; ...
+                0, element_height, 0; ...
+                element_width, element_height, 0; ...
+                element_width, 0, 0], ...
+                'The default polygon_template is incorrect.');
+        end % function testConstructorDefaultPolygon
         
         %% Property access methods
         
@@ -70,77 +118,96 @@ classdef RectangularArrayTest < matlab.unittest.TestCase
         function testListIntersectingElementsIncludesAll(tc)
             % testListIntersectingElementsIncludesAll ensures that all of
             % the intersecting elements are listed.  
-            
+
             [centerpoint, plane_axes, element_width, element_height, ...
                 nrows, ncols] = ...
                 RectangularArrayTest.genRandRectangularArrayParams();
-            
+
             ra = RectangularArray(centerpoint, plane_axes, ...
                 element_width, element_height, nrows, ncols);
-            
-            %% create a polygon that intersects this array
-            nvertices = randi([3,6]);
-            chord_angle_proportions = rand(nvertices, 1);
-            chord_angle = -2*pi * cumsum(chord_angle_proportions) / ...
-                sum(chord_angle_proportions);
-            
-            % Set r so that it is uniformly distributed from 0 to the
-            % longer of the array width or height.  
-            % This gives us a good probability of having vertices both
-            % inside and outside of the array.  
-            r_to_vertex = rand(nvertices, 1) * ...
-                max(element_width*ncols, element_height*nrows);
-            
-            poly_horiz = r_to_vertex .* cos(chord_angle);
-            poly_verti = r_to_vertex .* sin(chord_angle);
-            
-            intersecting_poly = [poly_horiz, poly_verti] * ...
-                [plane_axes.horizontal; plane_axes.vertical] + ...
-                repmat(centerpoint, nvertices, 1);
-            
-            %% use method under test to get intersections
-            test_element_list = ...
-                ra.listIntersectingElements(Polygon(intersecting_poly));
-            
-            %% check that all intersecting elements are listed
-            % For each element in the array,
-            %   - get the element's polygon
-            %   - convert the element's polygon to the same 2D coordinates
-            %   as in (poly_horiz, poly_verti)
-            %   - intersect the element's polygon against the polygon
-            %   (poly_horiz, poly_verti)
-            %   - if the intersection's area is greater than 0, verify that
-            %   the element is listed in test_element_list.
-            
+
             % A counter of the number of intersecting elements checked.
-            % If this value is still 0 at the end, there's a mistake in
-            % this test.
-            num_intersecting_elements = 0;            
-            for iy = 1:nrows
-                for ix = 1:ncols
-                    element_poly = ra.getPolygon(ix, iy).toMatrix();
-                    element_poly = element_poly - ...
-                        repmat(centerpoint, size(element_poly, 1), 1);
-                    ep_horiz = element_poly * plane_axes.horizontal';
-                    ep_verti = element_poly * plane_axes.vertical';
-                    
-                    [overlap_x, overlap_y] = polybool('intersection', ...
-                        ep_horiz, ep_verti, poly_horiz, poly_verti);
-                    
-                    if(polyarea(overlap_x, overlap_y) > 0)
-                        num_intersecting_elements = ...
-                            num_intersecting_elements + 1;
-                        
-                        tc.verifyTrue(any(ismember(...
-                            test_element_list, [ix, iy], 'rows')), ...
-                            'Intersecting element is missing from the list.');
-                    end % if polyarea
-                end % for ix
-            end % for iy
+            % Occasionally the random intersecting_poly may be generated
+            % such that it doesn't intersect any elements of the array.  
+            num_intersecting_elements = 0;
             
-            tc.assertGreaterThan(num_intersecting_elements, 0, ...
-                'Test did not check for any intersecting elements.');
+            % a counter of the number of trials ran so far (due to no
+            % intersecting elements)
+            num_trials = 0;
+            
+            % keep testing until we check at least one intersecting element
+            while(num_intersecting_elements == 0)
+
+                % ensure that we don't loop forever
+                tc.assertLessThan(num_trials, 1000, ...
+                    'Something''s wrong; none of our random polygons intersect the array elements.');
+                
+                %% create a polygon that intersects this array
+                nvertices = randi([3,6]);
+                chord_angle_proportions = rand(nvertices, 1);
+                chord_angle = 2*pi * cumsum(chord_angle_proportions) / ...
+                    sum(chord_angle_proportions);
+
+                % Set r so that it is uniformly distributed from 0 to the
+                % longer of the array width or height.  
+                % This gives us a good probability of having vertices both
+                % inside and outside of the array.  
+                r_to_vertex = rand(nvertices, 1) * ...
+                    max(element_width*ncols, element_height*nrows);
+
+                [poly_horiz, poly_verti] = pol2cart(chord_angle, r_to_vertex);
+
+                % convert to clockwise polygon to suppress polybool warnings
+                [poly_horiz, poly_verti] = poly2cw(poly_horiz, poly_verti);
+
+                intersecting_poly = [poly_horiz, poly_verti] * ...
+                    [plane_axes.horizontal; plane_axes.vertical] + ...
+                    repmat(centerpoint, nvertices, 1);
+
+                %% use method under test to get intersections
+                test_element_list = ...
+                    ra.listIntersectingElements(Polygon(intersecting_poly));
+
+                %% check that all intersecting elements are listed
+                % For each element in the array,
+                %   - get the element's polygon
+                %   - convert the element's polygon to the same 2D coordinates
+                %   as in (poly_horiz, poly_verti)
+                %   - intersect the element's polygon against the polygon
+                %   (poly_horiz, poly_verti)
+                %   - if the intersection's area is greater than 0, verify that
+                %   the element is listed in test_element_list.
+
+                for iy = 1:nrows
+                    for ix = 1:ncols
+                        element_poly = ra.getPolygon(ix, iy).toMatrix();
+                        element_poly = element_poly - ...
+                            repmat(centerpoint, size(element_poly, 1), 1);
+                        ep_horiz = element_poly * plane_axes.horizontal';
+                        ep_verti = element_poly * plane_axes.vertical';
+
+                        [overlap_x, overlap_y] = polybool('intersection', ...
+                            ep_horiz, ep_verti, poly_horiz, poly_verti);
+
+                        if(polyarea(overlap_x, overlap_y) > 0)
+                            num_intersecting_elements = ...
+                                num_intersecting_elements + 1;
+
+                            tc.verifyTrue(any(ismember(...
+                                test_element_list, [ix, iy], 'rows')), ...
+                                'Intersecting element is missing from the list.');
+                        end % if polyarea
+                    end % for ix
+                end % for iy
+
+                % increment the num_trials counter
+                num_trials = num_trials + 1;
+            end % while(num_intersecting_elements == 0)
+            
+            tc.assertGreaterThanOrEqual(num_trials, 1, ...
+                'We should have executed at least one trial.');
         end % function testListIntersectingElementsIncludesAll
+        
     end % methods(Test)
     
     methods(Static)
