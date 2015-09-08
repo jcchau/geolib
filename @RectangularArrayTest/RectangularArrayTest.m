@@ -123,6 +123,11 @@ classdef RectangularArrayTest < matlab.unittest.TestCase
                 nrows, ncols] = ...
                 RectangularArrayTest.genRandRectangularArrayParams();
 
+            % To avoid failing when we miss an element that barely touches
+            % the intersecting polygon since the omission may be due to a
+            % rounding error.
+            AREA_TOLERANCE = 1e-12 * element_width * element_height;
+            
             ra = RectangularArray(centerpoint, plane_axes, ...
                 element_width, element_height, nrows, ncols);
 
@@ -189,7 +194,7 @@ classdef RectangularArrayTest < matlab.unittest.TestCase
                         [overlap_x, overlap_y] = polybool('intersection', ...
                             ep_horiz, ep_verti, poly_horiz, poly_verti);
 
-                        if(polyarea(overlap_x, overlap_y) > 0)
+                        if(polyarea(overlap_x, overlap_y) > AREA_TOLERANCE)
                             num_intersecting_elements = ...
                                 num_intersecting_elements + 1;
 
