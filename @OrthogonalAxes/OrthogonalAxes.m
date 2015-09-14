@@ -54,6 +54,7 @@ classdef OrthogonalAxes
         end % function OrthogonalAxes
         
         vector = normal(obj)
+        [h, v, n] = transformPointsFromGlobal(obj, origin, inpoints)
     end
     
 end

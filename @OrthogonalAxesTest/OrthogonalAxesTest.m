@@ -46,6 +46,37 @@ classdef OrthogonalAxesTest < matlab.unittest.TestCase
             
             tc.verifyEqual(norm(deviation), 0, 'AbsTol', 1e-10);
         end % function testNormal
+        
+        %% transformPointsFromGlobal
+        function testTransformPointsFromGlobal(tc)
+            numpoints = randi([1, 5]);
+            inpoints = rand(numpoints, 3) ./ ...
+                repmat(rand(numpoints, 1), 1, 3);
+            
+            origin = rand(1,3) ./ rand();
+            
+            [axisA, axisB] = OrthogonalAxesTest.genAxesParams();
+            obj = OrthogonalAxes(axisA, axisB);
+            
+            [h, v, n] = obj.transformPointsFromGlobal(origin, inpoints);
+            
+            % check that the returned variables have the correct size
+            tc.verifyEqual(size(h), [numpoints, 1]);
+            tc.verifyEqual(size(v), [numpoints, 1]);
+            tc.verifyEqual(size(n), [numpoints, 1]);
+            
+            % convert outpoints back into global coordinates
+            back_to_global = repmat(origin, numpoints, 1) + ...
+                [h, v, n] * [obj.horizontal; obj.vertical; obj.normal()];
+            
+            % verify that the deviation is negligible
+            difference = back_to_global - inpoints;
+            
+            for ii = 1:numpoints
+                tc.verifyLessThan(norm(difference(ii, :)), 1e-11);
+            end % for ii
+            
+        end % function testTransformPointsFromGlobal
     end % methods(Test)
     
     methods(Static)
