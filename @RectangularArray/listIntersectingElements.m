@@ -20,9 +20,16 @@ function indices = listIntersectingElements(obj, polygon)
 %       the vertical index.  Each row reperesents one of the elements that
 %       intersects the given polygon.  
 %
+%   WARNING: The first column of INDICES is the column index.  This is
+%   (horizontal, vertical) order, not (row, column) order.
+%
 %   For simplicity, indices may include the indices of some elements that
 %   don't intersect the polygon.
 %   TODO: Improve the specificity of this function later.
+
+if(~isa(polygon, 'Polygon'))
+    error('Polygon must be a Polygon object.');
+end
 
 % First get 2D coordinates
 vertices3D = polygon.toMatrix();
