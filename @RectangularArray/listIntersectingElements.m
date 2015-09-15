@@ -63,6 +63,18 @@ x_max = floor(max(vx));
 y_min = floor(min(vy));
 y_max = floor(max(vy));
 
+% If vx==obj.ncols or vy==obj.nrows, that point is sitting on the rightmost
+% or topmost boundary of the RectangularArray respectively.  Using the
+% floor method like above, the boundary between index_x=ii and index_x=ii+1
+% belongs to index_x=ii+1; the same for index_y.  As a result, points
+% landing on the rightmost or topmost boundary would be assigned to
+% elements outside of the RectangularArray.  Ensure that these boundaries
+% are not assigned to elements outside of the RectangularArray (since that
+% can cause problems when the element indices are used to refer to elements
+% not in the RectangularArray).
+x_max = min(x_max, obj.ncols-1);
+y_max = min(y_max, obj.nrows-1);
+
 indices_x_values = (x_min:x_max)' + 1;
 indices_y_values = obj.nrows - (y_min:y_max)';
 
