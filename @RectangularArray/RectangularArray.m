@@ -130,7 +130,7 @@ classdef RectangularArray
         
         indices = listIntersectingElements(obj, polygon)
         
-        polygon = getPolygon(obj, ix, iy)
+        polygon = getPolygon(obj, row, column)
     end % methods
 end
 

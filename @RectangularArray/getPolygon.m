@@ -1,12 +1,26 @@
-function polygon = getPolygon(obj, ix, iy)
+function polygon = getPolygon(obj, row, column)
 % GETPOLYGON Returns the polygon for the specified element in the array.
 %
-% POLYGON = getPolygon(OBJ, IX, IY)
+% POLYGON = getPolygon(OBJ, ROW, COLUMN)
 %
 % OBJ is the RectangularArray object.
-% IX and IY are the horizontal and vertical indices of the element in the
-%   array.  
+% ROW and COLUMN are the MATLAB-matrix-style indices for the
+%   RectangularArray element specified.  ROW is an integer value from 1 to
+%   OBJ.nrows, where ROW 1 is the row with the largest coordinate value in
+%   the OBJ.plane_axes.vertical direction.  COLUMN is an integer value from
+%   1 to OBJ.ncols, where COLUMN 1 is the column with the minimum
+%   coordinate value in the OBJ.plane_axes.horizontal direction.
 % POLYGON is the polygon of the element at (IX,IY) in the array.
+
+% convert from (row, column) to (ix, iy)
+ix = column;
+iy = obj.nrows - row + 1;
+
+% ix and iy are the horizontal and vertical indices of the element in the
+%   array.  
+% In (ix, iy) indexing, ix is the same as column in (row, column) indexing,
+% but iy=1 corresponds to the row with the minimum coordinate value in the
+% OBJ.plane_axes.vertical direction (i.e., the minimum y-axis value).
 
 if(ix<1 || iy<1 || ix>obj.ncols || iy>obj.nrows)
     error('RectangularArray:IndexOutsideArray', ...

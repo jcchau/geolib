@@ -90,7 +90,8 @@ classdef RectangularArrayTest < matlab.unittest.TestCase
                 -104.5, 104, 1; ...
                 -104.5, 102, 1];
             
-            poly11_test = ra.getPolygon(1,1).toMatrix();
+            % (row, column) = (4,1)
+            poly11_test = ra.getPolygon(4,1).toMatrix();
             tc.verifyTrue(isequal(poly11_test, poly11_expected), ...
                 'The returned polygon for ix=1, iy=1 does not match the expected polygon.');
             
@@ -99,7 +100,8 @@ classdef RectangularArrayTest < matlab.unittest.TestCase
                 -104.5, 100, 1; ...
                 -101.5, 100, 1; ...
                 -101.5, 98, 1];
-            poly23_test = ra.getPolygon(2,3).toMatrix();
+            % (row, column) = (2,2)
+            poly23_test = ra.getPolygon(2,2).toMatrix();
             tc.verifyTrue(isequal(poly23_test, poly23_expected), ...
                 'The returned polygon for ix=2, iy=3 does not match the expected polygon.');
             
@@ -108,7 +110,8 @@ classdef RectangularArrayTest < matlab.unittest.TestCase
                 -95.5, 98, 1; ...
                 -92.5, 98, 1; ...
                 -92.5, 96, 1];
-            poly54_test = ra.getPolygon(5,4).toMatrix();
+            % (row, column) = (1,5)
+            poly54_test = ra.getPolygon(1,5).toMatrix();
             tc.verifyTrue(isequal(poly54_test, poly54_expected), ...
                 'The returned polygon for ix=5, iy=5 does not match the expected polygon.');
             
@@ -183,9 +186,9 @@ classdef RectangularArrayTest < matlab.unittest.TestCase
                 %   - if the intersection's area is greater than 0, verify that
                 %   the element is listed in test_element_list.
 
-                for iy = 1:nrows
-                    for ix = 1:ncols
-                        element_poly = ra.getPolygon(ix, iy).toMatrix();
+                for row = 1:nrows
+                    for column = 1:ncols
+                        element_poly = ra.getPolygon(row, column).toMatrix();
                         element_poly = element_poly - ...
                             repmat(centerpoint, size(element_poly, 1), 1);
                         ep_horiz = element_poly * plane_axes.horizontal';
@@ -199,11 +202,11 @@ classdef RectangularArrayTest < matlab.unittest.TestCase
                                 num_intersecting_elements + 1;
 
                             tc.verifyTrue(any(ismember(...
-                                test_element_list, [ix, iy], 'rows')), ...
+                                test_element_list, [row, column], 'rows')), ...
                                 'Intersecting element is missing from the list.');
                         end % if polyarea
-                    end % for ix
-                end % for iy
+                    end % for column
+                end % for row
 
                 % increment the num_trials counter
                 num_trials = num_trials + 1;

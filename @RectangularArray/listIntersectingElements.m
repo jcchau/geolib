@@ -15,13 +15,13 @@ function indices = listIntersectingElements(obj, polygon)
 %       the RectangularArray OBJ.  To convert the 3D POLYGON coordinates
 %       into indices, the POLYGON is projected onto this RectangularArray,
 %       discarding the normal component of each point.  
-%   INDICES is a NELEMENTS row by 2 column matrix, where the first column
-%       represents the horizontal index and the second column represents
-%       the vertical index.  Each row reperesents one of the elements that
-%       intersects the given polygon.  
-%
-%   WARNING: The first column of INDICES is the column index.  This is
-%   (horizontal, vertical) order, not (row, column) order.
+%   INDICES is a NELEMENTS row by 2 column matrix, where each row holds the
+%       (row, column) index of the RectangularArray element that intersects
+%       the provided POLYGON.  
+% 
+%   In (row, column) indexing, (1,1) is the top-left element of the array;
+%       this indexing is the same as the indexing MATLAB uses for 2D
+%       matrices. 
 %
 %   For simplicity, indices may include the indices of some elements that
 %   don't intersect the polygon.
@@ -70,6 +70,8 @@ indices_y_values = obj.nrows - (y_min:y_max)';
 
 % Here, we have some elements that don't intersect.
 % This will cause more computation in the future, but okay for now.
-indices = [index_x(:), index_y(:)];
+
+% Convert from (index_x, index_y) to (row, column) indexing.
+indices = [obj.nrows-index_y(:)+1, index_x(:)];
 
 end
