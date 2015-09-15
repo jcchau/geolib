@@ -23,7 +23,14 @@ classdef Plane
     methods
         %% Constructors
         function obj = Plane(point, normal)
-            % Constructor
+            % Plane constructs a Plane object.
+            %
+            % OBJ = Plane(POINT, NORMAL)
+            %
+            % POINT is a 3-column row vector representing the 3D coordinate
+            %   of a point on the plane. 
+            % NORMAL is a 3-column row vector representing the normal
+            %   vector of the plane. 
             
             if(nargin>0)    % for the no input argument case
                 obj.point = point;
