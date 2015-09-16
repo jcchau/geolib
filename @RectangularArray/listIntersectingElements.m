@@ -55,6 +55,12 @@ vertices2D(:,2) = vertices2D(:,2) + obj.nrows/2;
 % polybool returns a closed polygon (in which the last vertex equals the
 % first).
 
+% We appear to have rounding errors from polybool which may allow vx or vy
+% values slightly below 0 (which is outside of the RectangularArray). 
+% Ensure that any vx or vy less than 0 is treated as exactly 0.
+vx(vx<0) = 0;
+vy(vy<0) = 0;
+
 %% Determine the indices
 % For now, return all of the indices that fit within the rectangular window
 % that bounds the polygon.
