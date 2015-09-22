@@ -12,25 +12,15 @@ function polygon = getPolygon(obj, row, column)
 %   coordinate value in the OBJ.plane_axes.horizontal direction.
 % POLYGON is the polygon of the element at (IX,IY) in the array.
 
-% convert from (row, column) to (ix, iy)
-ix = column;
-iy = obj.nrows - row + 1;
-
-% ix and iy are the horizontal and vertical indices of the element in the
-%   array.  
-% In (ix, iy) indexing, ix is the same as column in (row, column) indexing,
-% but iy=1 corresponds to the row with the minimum coordinate value in the
-% OBJ.plane_axes.vertical direction (i.e., the minimum y-axis value).
-
-if(ix<1 || iy<1 || ix>obj.ncols || iy>obj.nrows)
+if(column<1 || row<1 || column>obj.ncols || row>obj.nrows)
     error('RectangularArray:IndexOutsideArray', ...
         'The provided indices are outside of the rectangular array.');
 end
 
 % calculate where the template polygon goes wrt the array's coordinate
 % system.
-element_anchor_x = (ix-1 - obj.ncols/2) * obj.element_width;
-element_anchor_y = (obj.nrows/2 - iy) * obj.element_height;
+element_anchor_x = (column-1 - obj.ncols/2) * obj.element_width;
+element_anchor_y = (obj.nrows/2 - row) * obj.element_height;
 
 % align the origin of the template with the the anchor point determined
 template = obj.polygon_template.toMatrix();

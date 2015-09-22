@@ -90,6 +90,6 @@ indices_y_values = obj.nrows - (y_min:y_max)';
 % This will cause more computation in the future, but okay for now.
 
 % Convert from (index_x, index_y) to (row, column) indexing.
-indices = [obj.nrows-index_y(:)+1, index_x(:)];
+indices = [index_y(:), index_x(:)];
 
 end

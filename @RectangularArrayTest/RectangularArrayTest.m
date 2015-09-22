@@ -90,8 +90,7 @@ classdef RectangularArrayTest < matlab.unittest.TestCase
                 -104.5, 104, 1; ...
                 -104.5, 102, 1];
             
-            % (row, column) = (4,1)
-            poly11_test = ra.getPolygon(4,1).toMatrix();
+            poly11_test = ra.getPolygon(1,1).toMatrix();
             tc.verifyTrue(isequal(poly11_test, poly11_expected), ...
                 'The returned polygon for ix=1, iy=1 does not match the expected polygon.');
             
@@ -100,8 +99,8 @@ classdef RectangularArrayTest < matlab.unittest.TestCase
                 -104.5, 100, 1; ...
                 -101.5, 100, 1; ...
                 -101.5, 98, 1];
-            % (row, column) = (2,2)
-            poly23_test = ra.getPolygon(2,2).toMatrix();
+            
+            poly23_test = ra.getPolygon(3,2).toMatrix();
             tc.verifyTrue(isequal(poly23_test, poly23_expected), ...
                 'The returned polygon for ix=2, iy=3 does not match the expected polygon.');
             
@@ -110,12 +109,38 @@ classdef RectangularArrayTest < matlab.unittest.TestCase
                 -95.5, 98, 1; ...
                 -92.5, 98, 1; ...
                 -92.5, 96, 1];
-            % (row, column) = (1,5)
-            poly54_test = ra.getPolygon(1,5).toMatrix();
+            
+            poly54_test = ra.getPolygon(4,5).toMatrix();
             tc.verifyTrue(isequal(poly54_test, poly54_expected), ...
                 'The returned polygon for ix=5, iy=5 does not match the expected polygon.');
             
         end % function testGetPolygonSimple
+        
+        %% getElementCenter
+        
+        function testGetElementCenterAgainstGetPolygon(tc)
+            [centerpoint, plane_axes, ...
+                element_width, element_height, nrows, ncols] = ...
+                RectangularArrayTest.genRandRectangularArrayParams();
+            
+            ra = RectangularArray(centerpoint, plane_axes, ...
+                element_width, element_height, nrows, ncols);
+            
+            for row = 1:nrows
+                for col = 1:ncols
+                    center_test = ra.getElementCenter(row, col);
+                    
+                    polygon = ra.getPolygon(row, col);
+                    polygon_matrix = polygon.toMatrix();
+                    center_polygon = mean(polygon_matrix, 1);
+                    
+                    magnitude_error = norm(center_test - center_polygon);
+                    
+                    tc.verifyLessThan(magnitude_error, 1e-10, ...
+                        'The center calculated by getCenter is too far from the center of the polygon representing the same element.');
+                end % for col
+            end % for row
+        end % function testGetElementCenterAgainstGetPolygon
         
         %% listIntersectingElements
         function testListIntersectingElementsIncludesAll(tc)
