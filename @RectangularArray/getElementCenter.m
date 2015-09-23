@@ -13,7 +13,8 @@ function center = getElementCenter(obj, row, column)
 %   Note that getElementCenter does not consider the pixel_template when
 %   determining the center of the element.
 
-if(row<1 || column<1 || row>obj.nrows || column>obj.ncols)
+if(any(row<1) || any(column<1) || any(row>obj.nrows) || ...
+        any(column>obj.ncols))
     error('RectangularArray:IndexOutsideArray', ...
         'The provided indices are outside of the rectangular array.');
 end
