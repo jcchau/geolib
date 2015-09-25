@@ -8,6 +8,8 @@ function [outX, outY, outZ] = rotateTo(zenithAngle, azimuth, tilt, ...
 % See "An Orientation Notation System for VLC" at
 % <https://slerc.ecse.rpi.edu/download/attachments/2162886/VLCOrientationNotation.pdf>
 % for more information about the orientation notation system used.  
+%
+% Angles are specified in radians.
 
 % From Wikipedia
 % <http://en.wikipedia.org/wiki/Euler_angles#Conversion_between_intrinsic_and_extrinsic_rotations>,
